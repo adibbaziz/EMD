@@ -43,4 +43,4 @@ class EMD():
 		objective_value = lpsolve('get_objective', emd_lp)
 		flow_matrix = np.array(lpsolve('get_variables', emd_lp)[0]).reshape((self.m, self.n))
 
-		return (objective_value, flow_matrix)w
+		return (objective_value, flow_matrix)
