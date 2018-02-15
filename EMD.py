@@ -18,29 +18,32 @@ class EMD():
 		self.WQ = sum([w for (_, w) in self.Q])
 		self.D = np.array([[d(np.array(p),np.array(q)) for (q,_) in Q] for (p,_) in P])
 
-	def write_lp_problem(self):
-		emd_lp = lpsolve('make_lp', 0, len(emd.D.flatten()))
-		lpsolve('set_verbose', emd_lp, IMPORTANT)
-		lpsolve('set_obj_fn', emd_lp, list(emd.D.flatten()))
+	def write_lp_problem(self, filename):
+		self.emd_lp = lpsolve('make_lp', 0, len(self.D.flatten()))
+		lpsolve('set_verbose', self.emd_lp, IMPORTANT)
+		lpsolve('set_obj_fn', self.emd_lp, list(self.D.flatten()))
 		for i in range(self.m):
 		    for j in range(self.n):
 		        Eij = np.zeros((self.m,self.n))
 		        Eij[i,j] += 1
-		        lpsolve('add_constraint', emd_lp, list(Eij.flatten()), GE, 0)
+		        lpsolve('add_constraint', self.emd_lp, list(Eij.flatten()), GE, 0)
 		for i in range(self.m):
 		    Ei = np.zeros((self.m,self.n))
 		    Ei[i,:] += 1
-		    lpsolve('add_constraint', emd_lp, list(Ei.flatten()), LE, emd.P[i][1])
+		    lpsolve('add_constraint', self.emd_lp, list(Ei.flatten()), LE, self.P[i][1])
 		for j in range(self.n):
 		    Ej = np.zeros((self.m,self.n))
 		    Ej[:,j] += 1
-		    lpsolve('add_constraint', emd_lp, list(Ej.flatten()), LE, emd.Q[j][1])
-		lpsolve('add_constraint', emd_lp, list(np.ones((self.m, self.n)).flatten()), EQ, min(emd.WP, emd.WQ))
-		lpsolve('write_lp', emd_lp, 'emd_pb.lp')
+		    lpsolve('add_constraint', self.emd_lp, list(Ej.flatten()), LE, self.Q[j][1])
+		lpsolve('add_constraint', self.emd_lp, list(np.ones((self.m, self.n)).flatten()), EQ, min(self.WP, self.WQ))
+		lpsolve('write_lp', self.emd_lp, filename)
+		print "Done!"
 
 
 	def solve_lp(self):
-		objective_value = lpsolve('get_objective', emd_lp)
-		flow_matrix = np.array(lpsolve('get_variables', emd_lp)[0]).reshape((self.m, self.n))
+		lpsolve('solve', self.emd_lp)
 
-		return (objective_value, flow_matrix)
+		self.distance = lpsolve('get_objective', self.emd_lp)
+		self.flow_matrix = np.array(lpsolve('get_variables', self.emd_lp)[0]).reshape((self.m, self.n))
+
+		return (self.distance, self.flow_matrix)
