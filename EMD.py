@@ -10,6 +10,8 @@ from lpsolve55 import *
 class EMD():
 
 	def __init__(self, P, Q, d):
+		self.m = len(P)
+		self.n = len(Q)
 		self.P = P
 		self.Q = Q
 		self.WP = sum([v for (_, v) in self.P])
@@ -20,18 +22,25 @@ class EMD():
 		emd_lp = lpsolve('make_lp', 0, len(emd.D.flatten()))
 		lpsolve('set_verbose', emd_lp, IMPORTANT)
 		lpsolve('set_obj_fn', emd_lp, list(emd.D.flatten()))
-		for i in range(len(emd.P)):
-		    for j in range(len(emd.Q)):
-		        Eij = np.zeros((len(emd.P),len(emd.Q)))
+		for i in range(self.m):
+		    for j in range(self.n):
+		        Eij = np.zeros((self.m,self.n))
 		        Eij[i,j] += 1
 		        lpsolve('add_constraint', emd_lp, list(Eij.flatten()), GE, 0)
-		for i in range(len(emd.P)):
-		    Ei = np.zeros((len(emd.P),len(emd.Q)))
+		for i in range(self.m):
+		    Ei = np.zeros((self.m,self.n))
 		    Ei[i,:] += 1
 		    lpsolve('add_constraint', emd_lp, list(Ei.flatten()), LE, emd.P[i][1])
-		for j in range(len(emd.Q)):
-		    Ej = np.zeros((len(emd.P),len(emd.Q)))
+		for j in range(self.n):
+		    Ej = np.zeros((self.m,self.n))
 		    Ej[:,j] += 1
 		    lpsolve('add_constraint', emd_lp, list(Ej.flatten()), LE, emd.Q[j][1])
-		lpsolve('add_constraint', emd_lp, list(np.ones((len(emd.P), len(emd.Q))).flatten()), EQ, min(emd.WP, emd.WQ))
+		lpsolve('add_constraint', emd_lp, list(np.ones((self.m, self.n)).flatten()), EQ, min(emd.WP, emd.WQ))
 		lpsolve('write_lp', emd_lp, 'emd_pb.lp')
+
+
+	def solve_lp():
+		objective_value = lpsolve('get_objective', emd_lp)
+		flow_matrix = np.array(lpsolve('get_variables', emd_lp)[0]).reshape((self.m, self.n))
+
+		return (objective_value, flow_matrix)
