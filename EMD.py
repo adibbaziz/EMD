@@ -18,7 +18,7 @@ class EMD():
 		self.WQ = sum([w for (_, w) in self.Q])
 		self.D = np.array([[d(np.array(p),np.array(q)) for (q,_) in Q] for (p,_) in P])
 
-	def write_lp_problem():
+	def write_lp_problem(self):
 		emd_lp = lpsolve('make_lp', 0, len(emd.D.flatten()))
 		lpsolve('set_verbose', emd_lp, IMPORTANT)
 		lpsolve('set_obj_fn', emd_lp, list(emd.D.flatten()))
@@ -39,8 +39,8 @@ class EMD():
 		lpsolve('write_lp', emd_lp, 'emd_pb.lp')
 
 
-	def solve_lp():
+	def solve_lp(self):
 		objective_value = lpsolve('get_objective', emd_lp)
 		flow_matrix = np.array(lpsolve('get_variables', emd_lp)[0]).reshape((self.m, self.n))
 
-		return (objective_value, flow_matrix)
+		return (objective_value, flow_matrix)w
