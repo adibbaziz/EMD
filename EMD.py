@@ -43,7 +43,7 @@ class EMD():
 	def solve_lp(self):
 		lpsolve('solve', self.emd_lp)
 
-		self.distance = lpsolve('get_objective', self.emd_lp)
+		self.objective = lpsolve('get_objective', self.emd_lp)
 		self.flow_matrix = np.array(lpsolve('get_variables', self.emd_lp)[0]).reshape((self.m, self.n))
+		self.distance = self.objective/np.sum(self.flow_matrix)
 
-		return (self.distance, self.flow_matrix)
