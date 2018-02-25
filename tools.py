@@ -2,17 +2,16 @@ import numpy as np
 from EMD import EMD
 
 
-def generate_normal(m,n,mu1, mu2):
-	P_points = np.random.multivariate_normal(mu1, np.eye(len(mu1)), m)
-	Q_points = np.random.multivariate_normal(mu1, np.eye(len(mu2)), n)
+def generate_normal(m,mu):
+	P_points = np.random.multivariate_normal(mu, np.eye(len(mu)), m)
 
 	P_weights = np.random.uniform(low=0, high=10, size=m)
-	Q_weights = np.random.uniform(low=0, high=10, size=n)
 
-	P = zip(P_points, P_weights)
-	Q = zip(Q_points, Q_weights)
+	return P_points, P_weights
 
-	return (P,Q)
+
+def generate_mixture_gaussians(m):
+	
 
 
 def compare_clusterings(C1, C2):
